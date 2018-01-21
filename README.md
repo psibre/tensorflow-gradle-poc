@@ -7,3 +7,10 @@ Adapted from the [TensorFlow Java docs](https://www.tensorflow.org/install/insta
 ```
 $ ./gradlew run
 ```
+
+### Usage with GPU
+
+To run with GPU support (assuming all drivers are installed), run with the `gpu` property:
+```
+$ ./gradlew run -Pgpu
+```

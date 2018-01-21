@@ -11,3 +11,13 @@ repositories {
 dependencies {
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.5.0-rc1'
 }
+
+if (hasProperty('gpu')) {
+    configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('org.tensorflow:libtensorflow_jni') with module('org.tensorflow:libtensorflow_jni_gpu:1.5.0-rc1')
+            }
+        }
+    }
+}
