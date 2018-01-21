@@ -1,0 +1,13 @@
+plugins {
+    id 'application'
+}
+
+mainClassName = 'HelloTF'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.tensorflow', name: 'tensorflow', version: '1.5.0-rc1'
+}
