@@ -9,8 +9,5 @@ build/
 # OSX
 .DS_Store
 
-# Data
-data/
-
 # emacs
 .meghanada
