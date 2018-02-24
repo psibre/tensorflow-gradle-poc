@@ -21,3 +21,37 @@ if (hasProperty('gpu')) {
         }
     }
 }
+
+task trainModel(type: TrainModel) {
+    srcDir = file('python_part')
+    destDir = layout.buildDirectory.dir('data')
+}
+
+class TrainModel extends DefaultTask {
+
+    @InputDirectory
+    final DirectoryProperty srcDir = newInputDirectory()
+
+    @OutputDirectory
+    final DirectoryProperty destDir = newOutputDirectory()
+
+    @TaskAction
+    void train() {
+        project.copy {
+            from srcDir
+            into temporaryDir
+        }
+        project.exec {
+            commandLine 'pipenv', '--three', 'install'
+            workingDir temporaryDir
+        }
+        project.exec {
+            commandLine 'pipenv', 'run', 'python3', 'train.py'
+            workingDir temporaryDir
+        }
+        project.copy {
+            from "$temporaryDir/data"
+            into destDir
+        }
+    }
+}
