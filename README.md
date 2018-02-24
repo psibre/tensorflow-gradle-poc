@@ -2,31 +2,18 @@
 
 Adapted from the [TensorFlow Java docs](https://www.tensorflow.org/install/install_java) for Gradle
 
-## Sequence
-First you have to train the models using the python part. Then you can load the model with java.
+## Usage
 
-### Python part
-#### Installing environement
-Assuming we are at the root of the repository
-```
-cd python_part
-pipenv install
-pipenv shell
-python train.py
-```
+First the model is trained using Python.
+Then you can load the model with Java.
 
-#### Running
-Assuming we are at the root of the repository
-```
-(cd python_part; python train.py)
-```
+[Python] 3 and [Pipenv] must be installed.
 
-### Gradle part
 ```
 ./gradlew run
 ```
 
-#### Usage with GPU
+### Usage with GPU
 
 To run with GPU support (assuming all drivers are installed), run with the `gpu` property
 ```
@@ -56,3 +43,5 @@ Run the prediction
 ./gradlew -Pgpu run
 ```
 
+[Pipenv]: https://docs.pipenv.org/
+[Python]: https://python.org/
