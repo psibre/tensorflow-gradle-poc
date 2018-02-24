@@ -142,7 +142,7 @@ with tf.Session() as sess:
 
     # Save model weights to disk
     tf.argmax(pred, 1, name="output")
-    save_model(sess, x, '../data/saved_model')
+    save_model(sess, x, 'data/saved_model')
 
 
 ###############################################################################
@@ -154,7 +154,7 @@ with tf.Session() as sess:
     sess.run(init)
 
     # Restore model weights from previously saved model
-    load_model('../data/saved_model', sess)
+    load_model('data/saved_model', sess)
 
     # Resume training
     for epoch in range(1):
