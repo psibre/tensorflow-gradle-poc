@@ -27,6 +27,11 @@ task trainModel(type: TrainModel) {
     destDir = layout.buildDirectory.dir('data')
 }
 
+run {
+    dependsOn trainModel
+    workingDir buildDir
+}
+
 class TrainModel extends DefaultTask {
 
     @InputDirectory
@@ -51,6 +56,7 @@ class TrainModel extends DefaultTask {
         }
         project.copy {
             from "$temporaryDir/data"
+            from "$project.rootDir/data"
             into destDir
         }
     }
