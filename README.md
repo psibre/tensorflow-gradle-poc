@@ -1,37 +1,47 @@
-# TensorFlow Gradle proof of concept
+# TensorFlow Gradle proof of concept with loading
 
 Adapted from the [TensorFlow Java docs](https://www.tensorflow.org/install/install_java) for Gradle
 
 ## Usage
 
+First the model is trained using Python.
+Then you can load the model with Java.
+
+[Python] 3 and [Pipenv] must be installed.
+
 ```
-$ ./gradlew run
+./gradlew run
 ```
 
 ### Usage with GPU
 
 To run with GPU support (assuming all drivers are installed), run with the `gpu` property
 ```
-$ ./gradlew run -Pgpu
+./gradlew run -Pgpu
 ```
 
-### Run with `nvidia-docker`
+#### Run with `nvidia-docker`
+##### Prepare the environment
+Generate the image
+```
+nvidia-docker build . -t test_tf_java
+```
 
-Run container interactively and install required packages
+Start docker container
 ```
-$ nvidia-docker run -it nvidia/cuda:9.0-cudnn7-devel /bin/bash
-# apt update
-# apt install -y curl unzip zip git
+nvidia-docker run -it test_tf_java /bin/bash
 ```
-Install [SDKMAN!](http://sdkman.io/) and use it to rapidly provision an OpenJDK
+
+#### In the container
+Run the training
 ```
-# curl -s "https://get.sdkman.io" | bash
-# source "$HOME/.sdkman/bin/sdkman-init.sh"
-# sdk install java 8u152-zulu
+(cd python_part/ && python train.py)
 ```
-Clone [this repo](https://github.com/psibre/tensorflow-gradle-poc) and run the proof of concept app
+
+Run the prediction
 ```
-# git clone https://github.com/psibre/tensorflow-gradle-poc.git
-# cd tensorflow-gradle-poc
-# ./gradlew run -Pgpu
+./gradlew -Pgpu run
 ```
+
+[Pipenv]: https://docs.pipenv.org/
+[Python]: https://python.org/

@@ -8,3 +8,6 @@ build/
 
 # OSX
 .DS_Store
+
+# emacs
+.meghanada

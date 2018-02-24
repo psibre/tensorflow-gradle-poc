@@ -2,7 +2,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'HelloTF'
+mainClassName = 'PredictExampleTF'
 
 repositories {
     jcenter()
@@ -18,6 +18,46 @@ if (hasProperty('gpu')) {
             dependencySubstitution {
                 substitute module('org.tensorflow:libtensorflow_jni') with module('org.tensorflow:libtensorflow_jni_gpu:1.5.0-rc1')
             }
+        }
+    }
+}
+
+task trainModel(type: TrainModel) {
+    srcDir = file('python_part')
+    destDir = layout.buildDirectory.dir('data')
+}
+
+run {
+    dependsOn trainModel
+    workingDir buildDir
+}
+
+class TrainModel extends DefaultTask {
+
+    @InputDirectory
+    final DirectoryProperty srcDir = newInputDirectory()
+
+    @OutputDirectory
+    final DirectoryProperty destDir = newOutputDirectory()
+
+    @TaskAction
+    void train() {
+        project.copy {
+            from srcDir
+            into temporaryDir
+        }
+        project.exec {
+            commandLine 'pipenv', '--three', 'install'
+            workingDir temporaryDir
+        }
+        project.exec {
+            commandLine 'pipenv', 'run', 'python3', 'train.py'
+            workingDir temporaryDir
+        }
+        project.copy {
+            from "$temporaryDir/data"
+            from "$project.rootDir/data"
+            into destDir
         }
     }
 }
