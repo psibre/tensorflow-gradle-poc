@@ -7,7 +7,7 @@ mainClassName = 'PredictExampleTF'
 
 ext {
     pyBootstrapDir = file("$buildDir/bootstrap")
-    pythonDep = 'python35_64'
+    pyEnvName = 'conda'
     pythonVersion = '3.5.3'
     tensorFlowVersion = '1.5.0'
 }
@@ -32,7 +32,7 @@ if (hasProperty('gpu')) {
 
 envs {
     bootstrapDirectory = pyBootstrapDir
-    python pythonDep, pythonVersion, ["tensorflow==$tensorFlowVersion"]
+    conda pyEnvName, ["tensorflow==$tensorFlowVersion"]
 }
 
 task trainModel(type: TrainModel) {
@@ -63,7 +63,7 @@ class TrainModel extends DefaultTask {
             into temporaryDir
         }
         project.exec {
-            commandLine project.file("$project.pyBootstrapDir/$project.pythonDep/bin/python3"), 'train.py'
+            commandLine project.file("$project.pyBootstrapDir/$project.pyEnvName/bin/python"), 'train.py'
             workingDir temporaryDir
         }
         project.copy {
