@@ -7,8 +7,6 @@ Adapted from the [TensorFlow Java docs](https://www.tensorflow.org/install/insta
 First the model is trained using Python.
 Then you can load the model with Java.
 
-[Python] 3 and [Pipenv] must be installed.
-
 ```
 ./gradlew run
 ```
@@ -42,6 +40,3 @@ Run the prediction
 ```
 ./gradlew -Pgpu run
 ```
-
-[Pipenv]: https://docs.pipenv.org/
-[Python]: https://python.org/
