@@ -7,9 +7,13 @@ mainClassName = 'PredictExampleTF'
 
 ext {
     pyBootstrapDir = file("$buildDir/bootstrap")
-    pyEnvName = 'conda'
-    pythonVersion = '3.5.3'
-    tensorFlowVersion = '1.5.0'
+    pyEnvName = 'Miniconda3-4.5.4'
+}
+
+extensions.create 'tensorflow', TensorFlowExtension, project
+
+tensorflow {
+    version = '1.5.0'
 }
 
 repositories {
@@ -17,14 +21,14 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.tensorflow', name: 'tensorflow', version: tensorFlowVersion
+    compile group: 'org.tensorflow', name: 'tensorflow', version: tensorflow.version
 }
 
 if (hasProperty('gpu')) {
     configurations.all {
         resolutionStrategy {
             dependencySubstitution {
-                substitute module('org.tensorflow:libtensorflow_jni') with module("org.tensorflow:libtensorflow_jni_gpu:$tensorFlowVersion")
+                substitute module('org.tensorflow:libtensorflow_jni') with module("org.tensorflow:libtensorflow_jni_gpu:$tensorflow.version")
             }
         }
     }
@@ -32,7 +36,7 @@ if (hasProperty('gpu')) {
 
 envs {
     bootstrapDirectory = pyBootstrapDir
-    conda pyEnvName, ["tensorflow==$tensorFlowVersion"]
+    conda pyEnvName, pyEnvName, [condaPackage(tensorflow.package)]
 }
 
 task trainModel(type: TrainModel) {
@@ -46,6 +50,29 @@ task trainModel(type: TrainModel) {
 run {
     dependsOn trainModel
     workingDir buildDir
+}
+
+class TensorFlowExtension {
+
+    Project project
+    Property<String> tfVersion = project.objects.property(String)
+
+    TensorFlowExtension(Project project) {
+        this.project = project
+    }
+
+    void setVersion(String version) {
+        tfVersion.set(version)
+    }
+
+    String getVersion() {
+        tfVersion.get()
+    }
+
+    String getPackage() {
+        def packageName = project.hasProperty('gpu') ? 'tensorflow-gpu' : 'tensorflow'
+        "$packageName==$version"
+    }
 }
 
 class TrainModel extends DefaultTask {
