@@ -17,30 +17,12 @@ Then you can load the model with Java.
 
 To run with GPU support (assuming all drivers are installed), run with the `gpu` property
 ```
-./gradlew run -Pgpu
-```
-
-#### Run with `nvidia-docker`
-##### Prepare the environment
-Generate the image
-```
-nvidia-docker build . -t test_tf_java
-```
-
-Start docker container
-```
-nvidia-docker run -it test_tf_java /bin/bash
-```
-
-#### In the container
-Run the training
-```
-(cd python_part/ && python train.py)
+./gradlew run -Pgpu=1
 ```
 
 Run the prediction
 ```
-./gradlew -Pgpu run
+./gradlew run
 ```
 
 [Docker]: https://www.docker.com/get-started
