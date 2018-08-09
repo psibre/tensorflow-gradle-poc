@@ -55,20 +55,22 @@ class TrainModel extends DefaultTask {
 
     @TaskAction
     void train() {
-        project.copy {
-            from srcDir
-            into temporaryDir
-        }
+        def dataZipFile = project.file("$temporaryDir/data.zip")
+        project.ant.zip destfile: dataZipFile, basedir: srcDir.get().asFile, compress: false
+        project.ant.chmod file: dataZipFile, perm: 'ugo+rw'
         def dockerCmd = gpu.get() > 0 ? 'nvidia-docker' : 'docker'
         def dockerImageTag = tensorFlowVersion.get() + '-devel' + (gpu.get() > 0 ? '-gpu-py3' : '-py3')
         def dockerEnv = "CUDA_VISIBLE_DEVICES=${gpu.get() - 1}"
         project.exec {
-            commandLine dockerCmd, 'run', '-e', dockerEnv, '-v', "$temporaryDir:/work", '-w', '/work',
-                    "tensorflow/tensorflow:$dockerImageTag", 'python', 'train.py'
-            workingDir temporaryDir
+            commandLine dockerCmd, 'run', '-e', dockerEnv, '-v', "$temporaryDir:/data", '-w', '/work',
+                    "tensorflow/tensorflow:$dockerImageTag", '/bin/bash', '-c',
+                    'unzip /data/data.zip && ' +
+                            'python train.py && ' +
+                            'cd data && ' +
+                            'zip -0r /data/data.zip *'
         }
         project.copy {
-            from "$temporaryDir/data"
+            from project.zipTree(dataZipFile)
             from "$project.rootDir/data"
             into destDir
         }
