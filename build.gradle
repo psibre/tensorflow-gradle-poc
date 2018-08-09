@@ -17,16 +17,6 @@ dependencies {
     compile group: 'org.tensorflow', name: 'tensorflow', version: tensorFlowVersion
 }
 
-if (project.gpu) {
-    configurations.all {
-        resolutionStrategy {
-            dependencySubstitution {
-                substitute module('org.tensorflow:libtensorflow_jni') with module("org.tensorflow:libtensorflow_jni_gpu:$tensorFlowVersion")
-            }
-        }
-    }
-}
-
 task trainModel(type: TrainModel) {
     tensorFlowVersion = project.tensorFlowVersion
     gpu = project.gpu
