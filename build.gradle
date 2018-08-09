@@ -5,7 +5,8 @@ plugins {
 mainClassName = 'PredictExampleTF'
 
 ext {
-    tensorFlowVersion = '1.8.0'
+    tensorFlowVersion = findProperty('tensorFlowVersion') ?: '1.8.0'
+    gpu = Integer.parseInt(findProperty('gpu') ?: '0')
 }
 
 repositories {
@@ -16,7 +17,7 @@ dependencies {
     compile group: 'org.tensorflow', name: 'tensorflow', version: tensorFlowVersion
 }
 
-if (hasProperty('gpu')) {
+if (project.gpu) {
     configurations.all {
         resolutionStrategy {
             dependencySubstitution {
@@ -28,7 +29,7 @@ if (hasProperty('gpu')) {
 
 task trainModel(type: TrainModel) {
     tensorFlowVersion = project.tensorFlowVersion
-    docker = 'docker'
+    gpu = project.gpu
     srcDir = file('python_part')
     destDir = layout.buildDirectory.dir('data')
 }
@@ -44,7 +45,7 @@ class TrainModel extends DefaultTask {
     Property<String> tensorFlowVersion = project.objects.property(String)
 
     @Input
-    Property<String> docker = project.objects.property(String)
+    Property<Integer> gpu = project.objects.property(Integer)
 
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()
@@ -58,9 +59,11 @@ class TrainModel extends DefaultTask {
             from srcDir
             into temporaryDir
         }
+        def dockerCmd = gpu.getOrNull() ? 'nvidia-docker' : 'docker'
+        def dockerImageTag = tensorFlowVersion.get() + '-devel' + (gpu.getOrNull() ? '-gpu-py3' : '-py3')
         project.exec {
-            commandLine docker.get(), 'run', '-v', "$temporaryDir:/work", '-w', '/work',
-                    "tensorflow/tensorflow:${this.tensorFlowVersion.get()}-devel-py3", 'python', 'train.py'
+            commandLine dockerCmd, 'run', '-v', "$temporaryDir:/work", '-w', '/work',
+                    "tensorflow/tensorflow:$dockerImageTag", 'python', 'train.py'
             workingDir temporaryDir
         }
         project.copy {
