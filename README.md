@@ -4,10 +4,10 @@ Adapted from the [TensorFlow Java docs](https://www.tensorflow.org/install/insta
 
 ## Usage
 
-First the model is trained using Python.
+First the model is trained using Python in Docker.
 Then you can load the model with Java.
 
-[Python] 3 and [Pipenv] must be installed.
+[Docker] must be installed.
 
 ```
 ./gradlew run
@@ -43,5 +43,4 @@ Run the prediction
 ./gradlew -Pgpu run
 ```
 
-[Pipenv]: https://docs.pipenv.org/
-[Python]: https://python.org/
+[Docker]: https://www.docker.com/get-started

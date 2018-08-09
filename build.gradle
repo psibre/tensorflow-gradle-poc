@@ -4,25 +4,31 @@ plugins {
 
 mainClassName = 'PredictExampleTF'
 
+ext {
+    tensorFlowVersion = '1.8.0'
+}
+
 repositories {
     jcenter()
 }
 
 dependencies {
-    compile group: 'org.tensorflow', name: 'tensorflow', version: '1.5.0-rc1'
+    compile group: 'org.tensorflow', name: 'tensorflow', version: tensorFlowVersion
 }
 
 if (hasProperty('gpu')) {
     configurations.all {
         resolutionStrategy {
             dependencySubstitution {
-                substitute module('org.tensorflow:libtensorflow_jni') with module('org.tensorflow:libtensorflow_jni_gpu:1.5.0-rc1')
+                substitute module('org.tensorflow:libtensorflow_jni') with module("org.tensorflow:libtensorflow_jni_gpu:$tensorFlowVersion")
             }
         }
     }
 }
 
 task trainModel(type: TrainModel) {
+    tensorFlowVersion = project.tensorFlowVersion
+    docker = 'docker'
     srcDir = file('python_part')
     destDir = layout.buildDirectory.dir('data')
 }
@@ -33,6 +39,12 @@ run {
 }
 
 class TrainModel extends DefaultTask {
+
+    @Input
+    Property<String> tensorFlowVersion = project.objects.property(String)
+
+    @Input
+    Property<String> docker = project.objects.property(String)
 
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()
@@ -47,11 +59,8 @@ class TrainModel extends DefaultTask {
             into temporaryDir
         }
         project.exec {
-            commandLine 'pipenv', '--three', 'install'
-            workingDir temporaryDir
-        }
-        project.exec {
-            commandLine 'pipenv', 'run', 'python3', 'train.py'
+            commandLine docker.get(), 'run', '-v', "$temporaryDir:/work", '-w', '/work',
+                    "tensorflow/tensorflow:${this.tensorFlowVersion.get()}-devel-py3", 'python', 'train.py'
             workingDir temporaryDir
         }
         project.copy {
