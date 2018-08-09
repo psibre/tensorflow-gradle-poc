@@ -59,10 +59,11 @@ class TrainModel extends DefaultTask {
             from srcDir
             into temporaryDir
         }
-        def dockerCmd = gpu.getOrNull() ? 'nvidia-docker' : 'docker'
-        def dockerImageTag = tensorFlowVersion.get() + '-devel' + (gpu.getOrNull() ? '-gpu-py3' : '-py3')
+        def dockerCmd = gpu.get() > 0 ? 'nvidia-docker' : 'docker'
+        def dockerImageTag = tensorFlowVersion.get() + '-devel' + (gpu.get() > 0 ? '-gpu-py3' : '-py3')
+        def dockerEnv = "CUDA_VISIBLE_DEVICES=${gpu.get() - 1}"
         project.exec {
-            commandLine dockerCmd, 'run', '-v', "$temporaryDir:/work", '-w', '/work',
+            commandLine dockerCmd, 'run', '-e', dockerEnv, '-v', "$temporaryDir:/work", '-w', '/work',
                     "tensorflow/tensorflow:$dockerImageTag", 'python', 'train.py'
             workingDir temporaryDir
         }
