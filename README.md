@@ -19,10 +19,11 @@ To run with GPU support (assuming all drivers are installed), run with the `gpu`
 ```
 ./gradlew run -Pgpu=1
 ```
-
-Run the prediction
+This will use the first GPU for training.
+On multi-GPU compute nodes, you can give a higher value to specify a different GPU, e.g.,
 ```
-./gradlew run
+./gradlew run -Pgpu=3
 ```
+which selects the third GPU.
 
 [Docker]: https://www.docker.com/get-started
